@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raksha Rail - Control Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #eef3f7; color: #1e293b; }
+
+        header {
+            height: 75px;
+            background: linear-gradient(90deg, #073b66, #075985);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 35px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.2);
+        }
+
+        .logo { display: flex; align-items: center; gap: 15px; }
+        .logo-icon { width: 45px; height: 45px; border-radius: 50%; background: white; display: flex; align-items: center; justify-content: center; font-size: 25px; }
+        .logo h2 { font-size: 21px; }
+        .logo p { font-size: 12px; opacity: 0.8; margin-top: 3px; }
+
+        .nav-links { display: flex; align-items: center; gap: 15px; }
+        .nav-btn {
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            background: rgba(255, 255, 255, 0.2);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .nav-btn:hover { background: rgba(255, 255, 255, 0.35); }
+        .logout-btn { background: #c62828; }
+        .logout-btn:hover { background: #b71c1c; }
+
+        .main { max-width: 1100px; margin: 30px auto; padding: 0 20px; }
+
+        .hero {
+            min-height: 205px;
+            border-radius: 22px;
+            padding: 35px;
+            color: white;
+            background: linear-gradient(rgba(3, 27, 45, 0.85), rgba(3, 27, 45, 0.85)),
+                        url("https://images.unsplash.com/photo-1474487548417-781cb71495f3?auto=format&fit=crop&w=1600&q=80");
+            background-size: cover;
+            background-position: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        .hero h1 { font-size: 32px; margin-bottom: 12px; }
+        .hero p { max-width: 800px; line-height: 1.6; color: #e2e8f0; }
+        .active { display: inline-block; margin-top: 20px; background: #31b34a; padding: 9px 18px; border-radius: 25px; font-weight: bold; }
+
+        .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 25px; }
+        .card { background: white; min-height: 160px; border-radius: 18px; padding: 25px 15px; text-align: center; cursor: pointer; border: 2px solid transparent; box-shadow: 0 5px 20px rgba(0,0,0,0.08); transition: 0.3s; }
+        .card:hover { transform: translateY(-7px); border-color: #1685b5; box-shadow: 0 10px 25px rgba(0,0,0,0.15); }
+        .icon { width: 55px; height: 55px; margin: auto; border-radius: 50%; background: #e8f5fa; display: flex; align-items: center; justify-content: center; font-size: 30px; margin-bottom: 15px; }
+        .card h3 { font-size: 17px; margin-bottom: 8px; }
+        .card p { font-size: 13px; color: #64748b; }
+
+        .dashboard { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 22px; }
+        .panel { background: white; border-radius: 18px; padding: 25px; min-height: 200px; box-shadow: 0 5px 20px rgba(0,0,0,0.07); }
+        .panel h2 { margin-bottom: 20px; font-size: 18px; color: #073b66; }
+
+        .attention { display: flex; justify-content: center; align-items: center; height: 120px; }
+        .circle { width: 125px; height: 125px; border-radius: 50%; border: 16px solid #d8e5df; border-top-color: #20a447; border-right-color: #20a447; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: bold; color: #16803b; }
+
+        .scanner-status { text-align: center; padding: 20px 0; }
+        .status-badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 10px 20px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; }
+
+        .safety { margin-top: 22px; background: linear-gradient(135deg, #075985, #0f766e); color: white; padding: 25px; border-radius: 18px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
+        .safety h2 { margin-bottom: 10px; }
+        .safety p { line-height: 1.6; }
+
+        .modal { display: none; position: fixed; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.65); align-items: center; justify-content: center; z-index: 1000; }
+        .modal-box { width: 420px; max-width: 90%; background: white; padding: 30px; border-radius: 20px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.4); }
+        .modal-icon { font-size: 55px; margin-bottom: 15px; }
+        .modal-box h2 { margin-bottom: 12px; }
+        .modal-box p { color: #64748b; line-height: 1.6; }
+        .close-btn { margin-top: 20px; padding: 10px 25px; border: none; border-radius: 8px; background: #075985; color: white; cursor: pointer; }
+
+        @media(max-width: 800px) {
+            .cards { grid-template-columns: 1fr; }
+            .dashboard { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 26px; }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="logo">
+        <div class="logo-icon">🛡️</div>
+        <div>
+            <h2>Raksha Rail</h2>
+            <p>Mobile Detection System</p>
+        </div>
+    </div>
+
+    <div class="nav-links">
+        <a href="page3.html" class="nav-btn">📷 Camera & Detection</a>
+        <a href="loginform.html" class="nav-btn logout-btn">🚪 Logout</a>
+    </div>
+</header>
+
+<div class="main">
+    <section class="hero">
+        <h1>Narcotics And Explosive Across Indian Railways</h1>
+        <p>Handheld monitoring system for real-time detection of suspicious baggage, contraband trace, and hazard alerts.</p>
+        <span class="active">● SENSORS ACTIVE</span>
+    </section>
+
+    <section class="cards">
+        <div class="card" onclick="showFeature('narcotics')">
+            <div class="icon">🧪</div>
+            <h3>Narcotics Scanner</h3>
+            <p>Chemical contraband detection</p>
+        </div>
+
+        <div class="card" onclick="showFeature('explosive')">
+            <div class="icon">💣</div>
+            <h3>Explosive Trace</h3>
+            <p>Vapor & particle detection</p>
+        </div>
+
+        <div class="card" onclick="window.location.href='page3.html'">
+            <div class="icon">📍</div>
+            <h3>Live Surveillance</h3>
+            <p>Camera & platform location</p>
+        </div>
+    </section>
+
+    <section class="dashboard">
+        <div class="panel">
+            <h2>🛡️ System Security Index</h2>
+            <div class="attention">
+                <div class="circle">98% CLEAR</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>📊 Trace Detector Status</h2>
+            <div class="scanner-status">
+                <div class="status-badge">VAPOR SENSORS ONLINE</div>
+                <p>Continuous monitoring across platforms and coaches active.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="safety">
+        <h2>🛡️ Safety & Security Operations</h2>
+        <p>This handheld security system integrates narcotics detection algorithms, explosive trace scanners, and live camera analysis to assist RPF and security teams in real-time threat prevention.</p>
+    </section>
+</div>
+
+<div class="modal" id="featureModal">
+    <div class="modal-box">
+        <div class="modal-icon" id="modalIcon"></div>
+        <h2 id="modalTitle"></h2>
+        <p id="modalText"></p>
+        <button class="close-btn" onclick="closeFeature()">Close</button>
+    </div>
+</div>
+
+<script>
+function showFeature(feature) {
+    let title = "", text = "", icon = "";
+
+    if (feature === "narcotics") {
+        title = "Narcotics Detection"; icon = "🧪";
+        text = "Handheld spectral scanning identifies illegal narcotics and chemical trace residues in real time.";
+    } else if (feature === "explosive") {
+        title = "Explosive Trace Detection"; icon = "💣";
+        text = "Vapor sensors analyze air and surface particles for high-risk explosive compounds.";
+    }
+
+    document.getElementById("modalIcon").innerHTML = icon;
+    document.getElementById("modalTitle").innerText = title;
+    document.getElementById("modalText").innerText = text;
+    document.getElementById("featureModal").style.display = "flex";
+}
+
+function closeFeature() {
+    document.getElementById("featureModal").style.display = "none";
+}
+</script>
+</body>
+</html>
