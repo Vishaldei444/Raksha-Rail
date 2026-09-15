@@ -155,8 +155,8 @@
 
             <form onsubmit="loginUser(event)">
                 <div class="input-box">
-                    <label>Officer / Driver ID</label>
-                    <input type="text" id="email" placeholder="Enter Official ID / Email" required>
+                    <label>Gmail Address</label>
+                    <input type="email" id="email" placeholder="example@gmail.com" required>
                 </div>
 
                 <div class="input-box">
@@ -181,13 +181,30 @@
     <script>
         function loginUser(event) {
             event.preventDefault();
-            let email = document.getElementById("email").value;
-            let password = document.getElementById("password").value;
+            let email = document.getElementById("email").value.trim();
+            let password = document.getElementById("password").value.trim();
 
-            if (email !== "" && password !== "") {
-                alert("🛡️ Login Successful! Accessing Raksha Rail Control Dashboard...");
-                window.location.href = "page2.html";
+            // Gmail format patterncheck (@gmail.com validation)
+            let gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+
+            if (!gmailRegex.test(email)) {
+                alert("❌ Please enter a valid Gmail address (e.g., user@gmail.com)");
+                return;
             }
+
+            if (password === "") {
+                alert("❌ Please enter your password!");
+                return;
+            }
+
+            if (password.length < 6) {
+                alert("❌ Password must be at least 6 characters long!");
+                return;
+            }
+
+            // Validations pass hone par hi access milega
+            alert("🛡️ Login Successful! Accessing Raksha Rail Control Dashboard...");
+            window.location.href = "page2.html";
         }
     </script>
 </body>
